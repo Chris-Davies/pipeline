@@ -1,0 +1,6 @@
+OK Line 1
+WARN Line 2
+WARN Line 3
+OK Line 4
+ERROR Line 5
+
