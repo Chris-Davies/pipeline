@@ -1,5 +1,5 @@
 pipeline {
-	agent { node { label 'LinuxNode'} }
+	agent { node { label "${NODE_TYPE}" }
   environment {
     PIPELINE_DIR="."
     BRANCH_DIR="Repo"
