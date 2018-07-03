@@ -23,7 +23,6 @@ pipeline {
     }
     post {
       always {
-        junit healthScaleFactor: 0.0, testDataPublishers: [[$class: 'ClaimTestDataPublisher']], testResults: 'Repo/build/' + env.BUILD_TYPE +'/test-*.xml'
         publishHTML (target: [
             allowMissing: false,
             alwaysLinkToLastBuild: false,
@@ -38,6 +37,11 @@ pipeline {
     stage ('Test') { 
       steps {
         sh 'Repo/${PIPELINE_DIR}/test.sh'
+      }
+    }
+    post {
+      always {
+        junit healthScaleFactor: 0.0, testDataPublishers: [[$class: 'ClaimTestDataPublisher']], testResults: 'Repo/build/' + env.BUILD_TYPE +'/test-*.xml'
       }
     }
     stage ('Package') {
