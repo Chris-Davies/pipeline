@@ -19,18 +19,18 @@ pipeline {
       steps {
         dir('build_reports') { deleteDir(); }
         sh 'printenv'
-        sh 'Repo/${PIPELINE_DIR}/build.sh'
+        sh '${BRANCH_DIR}/${PIPELINE_DIR}/build.sh'
       }
     }
     stage ('Test') { 
       steps {
-        sh 'Repo/${PIPELINE_DIR}/test.sh'
+        sh '${BRANCH_DIR}/${PIPELINE_DIR}/test.sh'
       }
     }
     stage ('Package') {
       steps {
        sh 'Repo/${PIPELINE_DIR}/package.sh'
-        archiveArtifacts artifacts: 'Repo/build/${BUILD_TYPE}/*.tar.gz', fingerprint: true
+        archiveArtifacts artifacts: '${BRANCH_DIR}/build/${BUILD_TYPE}/*.tar.gz', fingerprint: true
       }
     }
   }

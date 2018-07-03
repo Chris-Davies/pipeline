@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "Running test"
-mkdir -p build/${BUILD_TYPE}
-cat > build/${BUILD_TYPE}/test-file.xml << EOM
+mkdir -p ${BRANCH_DIR}/build/${BUILD_TYPE}
+cat > ${BRANCH_DIR}/build/${BUILD_TYPE}/test-file.xml << EOM
 <testsuite errors="0" failures="0" name="test-file" tests="23" time="0.0020" >
 	<testcase classname="FileFactoryTest" name="testRegisterFile" time="0.0001" >
 	</testcase>
