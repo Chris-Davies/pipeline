@@ -35,7 +35,7 @@ pipeline {
         dir('build_reports') { deleteDir(); }
         sh 'printenv'
         sh "${BRANCH_DIR}/${PIPELINE_DIR}/build.sh"
-        test_build_results
+        test_build_results()
       }
       post {
         always {
