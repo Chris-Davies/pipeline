@@ -51,5 +51,5 @@ cat > build/${BUILD_TYPE}/test-file.xml << EOM
 	</testcase>
 </testsuite>
 EOM
-ls -al build/${BUILD_TYPE}
+ls -aRl build
 
