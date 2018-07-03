@@ -1,3 +1,12 @@
+def get_node() {
+  if ("$PLATFORM" == "linux_64") return "LinuxNode";
+  if ("$PLATFORM" == "sun") return "SunSPARC";
+  if ("$PLATFORM" == "sun_64") return "SunSPARC";
+  if ("$PLATFORM" == "sunx86_64") return "Sunx86";
+  if ("$PLATFORM" == "aix_64") return "AIX";
+  return none;
+}
+
 def test_build_results() {
   def out = sh script: "cat ${BRANCH_DIR}/build/${BUILD_TYPE}/build-result.txt", returnStdout: true
   def (res, err , warn) = out.trim().tokenize(':')
@@ -14,7 +23,7 @@ def test_build_results() {
 }
 
 pipeline {
-	agent { node { label "${NODE_TYPE}" } }
+	agent { node { label get_node() } }
   environment {
     PIPELINE_DIR="."
     BRANCH_DIR="Repo"
