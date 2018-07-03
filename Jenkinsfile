@@ -32,7 +32,6 @@ pipeline {
             reportFiles: 'build.html',
             reportName: "Build Report"
           ])
-        }
       }
     }
     stage ('Test') { 
