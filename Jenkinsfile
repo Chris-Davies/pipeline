@@ -22,6 +22,19 @@ pipeline {
         sh '${BRANCH_DIR}/${PIPELINE_DIR}/build.sh'
       }
     }
+    post {
+      always {
+        publishHTML (target: [
+            allowMissing: false,
+            alwaysLinkToLastBuild: false,
+            keepAll: true,
+            reportDir: 'build_reports',
+            reportFiles: 'build.html',
+            reportName: "Build Report"
+          ])
+        }
+      }
+    }
     stage ('Test') { 
       steps {
         sh '${BRANCH_DIR}/${PIPELINE_DIR}/test.sh'
