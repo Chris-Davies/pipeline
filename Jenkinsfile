@@ -30,7 +30,7 @@ pipeline {
     stage ('Package') {
       steps {
        sh 'Repo/${PIPELINE_DIR}/package.sh'
-        archiveArtifacts artifacts: ${BRANCH_DIR} + '/build/${BUILD_TYPE}/*.tar.gz', fingerprint: true
+        archiveArtifacts artifacts: "${BRANCH_DIR}/build/${BUILD_TYPE}/*.tar.gz", fingerprint: true
       }
     }
   }
