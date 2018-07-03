@@ -20,6 +20,7 @@ pipeline {
         dir('build_reports') { deleteDir(); }
         sh 'printenv'
         sh 'Repo/${PIPELINE_DIR}/build.sh'
+      }
     }
     post {
       always {
@@ -31,7 +32,6 @@ pipeline {
             reportFiles: 'build.html',
             reportName: "Build Report"
           ])
-        }
       }
     }
     stage ('Test') { 
@@ -48,11 +48,6 @@ pipeline {
       steps {
        sh 'Repo/${PIPELINE_DIR}/package.sh'
         archiveArtifacts artifacts: 'Repo/build/${BUILD_TYPE}/*.tar.gz', fingerprint: true
-      }
-      post {
-        always {
-          junit healthScaleFactor: 0.0, testDataPublishers: [[$class: 'ClaimTestDataPublisher']], testResults: 'Repo/build/' + env.BUILD_TYPE +'/test-*.xml'
-        }
       }
     }
   }
