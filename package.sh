@@ -2,4 +2,6 @@
 echo "Running package"
 mkdir -p build/${BUILD_TYPE}
 touch build/${BUILD_TYPE}/gateway2.tar.gz
-ls -al build/${BUILD_TYPE}
+
+ls -aRl build
+ls -aRl build/${BUILD_TYPE}/gateway2.tar.gz
