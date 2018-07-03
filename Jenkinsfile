@@ -1,3 +1,18 @@
+def test_build_results() {
+  def out = sh script: "cat ${BRANCH_DIR}/build/${BUILD_TYPE}/build-result.txt", returnStdout: true
+  def (res, err , warn) = out.trim().tokenize(':')
+  if (res.toInteger()>0) {
+    echo "Make returned error: Setting build to FAILURE"
+    currentBuild.result = 'FAILURE'
+  } else if (err.toInteger()>0) {
+    echo "Output parser founded errors: Setting build to FAILURE" 
+    currentBuild.result = 'FAILURE'
+  } else if (warn.toInteger()>0) {
+    echo "Output parser founded warnings: Setting build to UNSTABLE"
+    currentBuild.result = 'UNSTABLE'
+  }
+}
+
 pipeline {
 	agent { node { label "${NODE_TYPE}" } }
   environment {
@@ -20,6 +35,7 @@ pipeline {
         dir('build_reports') { deleteDir(); }
         sh 'printenv'
         sh "${BRANCH_DIR}/${PIPELINE_DIR}/build.sh"
+        test_build_results
       }
       post {
         always {
