@@ -2,3 +2,4 @@
 echo "Running build"
 mkdir -p build/${BUILD_TYPE}
 touch build/${BUILD_TYPE}/gateway2
+ls -al build/${BUILD_TYPE}
