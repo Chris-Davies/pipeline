@@ -33,58 +33,57 @@ def build_node() {
   def stages = [failFast: true]
   stages ["All"] = {
     node("LinuxNode") {
-        stage('Checkout') {
-          steps { checkout scm }
-        }
-        stage("Clean") {
-          when { not { branch 'jenkins-pipeline-sandbox'} }
-           steps { sh "rm -rf build" }
-        }
-        stage("Build") {
-          steps {
-            dir('build_reports') { deleteDir(); }
-            sh "${PIPELINE_DIR}/build.sh"
-            test_build_results()
+      stage('Checkout') {
+        steps { checkout scm }
+      }
+      stage("Clean") {
+        when { not { branch 'jenkins-pipeline-sandbox'} }
+        steps { sh "rm -rf build" }
+      }
+      stage("Build") {
+        steps {
+          dir('build_reports') { deleteDir(); }
+          sh "${PIPELINE_DIR}/build.sh"
+          test_build_results()
         }
         post {
-            always {
-              publishHTML (target: [
-                  allowMissing: false,
-                  alwaysLinkToLastBuild: false,
-                  keepAll: true,
-                  reportDir: 'build_reports',
-                  reportFiles: 'build.html',
-                  reportName: "Build Report ($PLATFORM)"
-                ])
-            }
+          always {
+            publishHTML (target: [
+              allowMissing: false,
+              alwaysLinkToLastBuild: false,
+              keepAll: true,
+              reportDir: 'build_reports',
+              reportFiles: 'build.html',
+              reportName: "Build Report ($PLATFORM)"
+            ])
           }
         }
-        stage ('Test') {
-          when {
-             expression { PLATFORM == 'linux_64' ||  PLATFORM == 'sunx86_64' ||  PLATFORM == 'sun_64' ||  PLATFORM == 'sun' }
-          }
-          environment {
-            CTEST_NODE_FILTER=get_node_test_filter()
-          }
-          steps {
-            sh '${PIPELINE_DIR}/test.sh'
-          }
-          post {
-            always {
-              junit healthScaleFactor: 0.0, testDataPublishers: [[$class: 'ClaimTestDataPublisher']], testResults: "build/${BUILD_TYPE}/test-*.xml"
-            }
+      }
+      stage ('Test') {
+        when {
+          expression { PLATFORM == 'linux_64' ||  PLATFORM == 'sunx86_64' ||  PLATFORM == 'sun_64' ||  PLATFORM == 'sun' }
+        }
+        environment {
+          CTEST_NODE_FILTER=get_node_test_filter()
+        }
+        steps {
+          sh '${PIPELINE_DIR}/test.sh'
+        }
+        post {
+          always {
+            junit healthScaleFactor: 0.0, testDataPublishers: [[$class: 'ClaimTestDataPublisher']], testResults: "build/${BUILD_TYPE}/test-*.xml"
           }
         }
-        stage ('Package') {
-          steps {
-           sh '${PIPELINE_DIR}/package.sh'
-            archiveArtifacts artifacts: "build/${BUILD_TYPE}/*.tar.gz", fingerprint: true
-          }
+      }
+      stage ('Package') {
+        steps {
+          sh '${PIPELINE_DIR}/package.sh'
+          archiveArtifacts artifacts: "build/${BUILD_TYPE}/*.tar.gz", fingerprint: true
         }
       }
     }
   }
-  return 
+  return stages
 }
 pipeline {
   agent { node { label get_node() } }
