@@ -71,7 +71,7 @@ pipeline {
       when { not { branch 'jenkins-pipeline-sandbox'} }
       steps { sh "rm -rf build" }
     }
-    stage("Build") build()
+    stage("Build") script { build() }
     stage ('Test') {
       when {
          expression { PLATFORM == 'linux_64' ||  PLATFORM == 'sunx86_64' ||  PLATFORM == 'sun_64' ||  PLATFORM == 'sun' }
