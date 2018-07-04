@@ -47,7 +47,7 @@ pipeline {
     }
     stage("Clean") {
       when { not { branch 'jenkins-pipeline-sandbox'} }
-      sh "rm -rf build"
+       steps { sh "rm -rf build" }
     }
     stage("Build") {
       steps {
