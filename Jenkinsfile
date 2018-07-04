@@ -8,7 +8,7 @@ def get_node() {
 }
 
 def test_build_results() {
-  def out = sh script: "cat ${BRANCH_DIR}/build/${BUILD_TYPE}/build-result.txt", returnStdout: true
+  def out = sh script: "cat build/${BUILD_TYPE}/build-result.txt", returnStdout: true
   def (res, err , warn) = out.trim().tokenize(':')
   if (res.toInteger()>0) {
     echo "Make returned error: Setting build to FAILURE"
@@ -22,28 +22,37 @@ def test_build_results() {
   }
 }
 
+def get_node_test_filter() {
+  if ("$PLATFORM" == "sun") return "-E \"test-(http|database)\"";
+  if ("$PLATFORM" == "sun_64") return "-E \"test-(http|database)\"";
+  if ("$PLATFORM" == "sunx86_64") return "-E test-http";
+  return "";
+}
+
 pipeline {
-	agent { node { label get_node() } }
+  agent { node { label get_node() } }
   environment {
-    PIPELINE_DIR="."
-    BRANCH_DIR="Repo"
+    PIPELINE_DIR="JenkinsPipeline/MW"
   }
-	options {
-    	ansiColor('xterm')
-    	skipDefaultCheckout()
-    	timestamps()
-    	buildDiscarder(logRotator(numToKeepStr: '3'))
+  options {
+      ansiColor('xterm')
+      skipDefaultCheckout()
+      timestamps()
+      buildDiscarder(logRotator(numToKeepStr: '3'))
   }
 
-	stages {
-		stage('Checkout') {
+  stages {
+    stage('Checkout') {
       steps { checkout scm }
     }
-  	stage("Build") {
+    stage("Clean") {
+      when { not { branch 'jenkins-pipeline-sandbox'} }
+      sh "rm -rf build"
+    }
+    stage("Build") {
       steps {
         dir('build_reports') { deleteDir(); }
-        sh 'printenv'
-        sh "${BRANCH_DIR}/${PIPELINE_DIR}/build.sh"
+        sh "${PIPELINE_DIR}/build.sh"
         test_build_results()
       }
       post {
@@ -54,25 +63,31 @@ pipeline {
               keepAll: true,
               reportDir: 'build_reports',
               reportFiles: 'build.html',
-              reportName: "Build Report"
+              reportName: "Build Report ($PLATFORM)"
             ])
         }
       }
     }
-    stage ('Test') { 
+    stage ('Test') {
+      when {
+         expression { PLATFORM == 'linux_64' ||  PLATFORM == 'sunx86_64' ||  PLATFORM == 'sun_64' ||  PLATFORM == 'sun' }
+      }
+      environment {
+        CTEST_NODE_FILTER=get_node_test_filter()
+      }
       steps {
-        sh '${BRANCH_DIR}/${PIPELINE_DIR}/test.sh'
+        sh '${PIPELINE_DIR}/test.sh'
       }
       post {
         always {
-          junit healthScaleFactor: 0.0, testDataPublishers: [[$class: 'ClaimTestDataPublisher']], testResults: "${BRANCH_DIR}/build/${BUILD_TYPE}/test-*.xml"
+          junit healthScaleFactor: 0.0, testDataPublishers: [[$class: 'ClaimTestDataPublisher']], testResults: "build/${BUILD_TYPE}/test-*.xml"
         }
       }
     }
     stage ('Package') {
       steps {
-       sh 'Repo/${PIPELINE_DIR}/package.sh'
-        archiveArtifacts artifacts: "${BRANCH_DIR}/build/${BUILD_TYPE}/*.tar.gz", fingerprint: true
+       sh '${PIPELINE_DIR}/package.sh'
+        archiveArtifacts artifacts: "build/${BUILD_TYPE}/*.tar.gz", fingerprint: true
       }
     }
   }
