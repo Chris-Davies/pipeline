@@ -98,6 +98,8 @@ pipeline {
   }
 
   stages {
-    parallel build_node()
+    script {
+      parallel build_node()
+    }
   }
 }
