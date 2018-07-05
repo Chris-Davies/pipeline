@@ -29,10 +29,6 @@ def get_node_test_filter() {
   return "";
 }
 
-def build() {
-  return { 
-   
-}
 
 pipeline {
   agent { node { label get_node() } }
